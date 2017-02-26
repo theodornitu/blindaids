@@ -3,7 +3,9 @@
 /*** Copyright:   ***/
 /*** Licence    ***/
 
-// Average human walking speed: 5Km/h = 1.38m/s = 
+// Average human walking speed: 5Km/h = 1.38m/s = 0.138 cm/ms
+// We will consider that a full meter  will take up to 724.63 ms at a 5km/h speed.
+
 
 
 // Sensor and motors pins definition
@@ -21,6 +23,7 @@ long duration, distance, RightSensor,LeftSensor;
 long dist_max_left=0;
 long dist_max_right=0;
 float Mot_left,Mot_right;
+float maximum_measure_distance=400;
 // End of distance constraints
 
 void setup()
@@ -36,8 +39,6 @@ void setup()
   pinMode(Mot_left_pin, OUTPUT);
   pinMode(Mot_right_pin, OUTPUT);
   // End of pins initialization
-  
-
 }
 
 void loop()
@@ -46,17 +47,22 @@ void loop()
   // Left sensor distance measurement
   SonarSensor(L_TRIG, L_ECHO); 
   LeftSensor = distance;
-  if(dist_max_left<LeftSensor)
+  if(dist_max_left<LeftSensor && LeftSensor<maximum_measure_distance)
     dist_max_left=LeftSensor;
   // End of left sensor distance measurement
   
   // Right sensor distance measurement
   SonarSensor(R_TRIG, R_ECHO);
   RightSensor = distance;
-  if(dist_max_right<RightSensor)
+  if(dist_max_right<RightSensor && RightSensor<maximum_measure_distance)
     dist_max_right=RightSensor;
   // End of right sensor distance measurement
   
+  // Verifying the range limit
+  if(RightSensor < maximum_measure_distance || LeftSensor < maximum_measure_distance)
+ {
+   
+   
   // Right sensor serial printing
   Serial.print("Ditanta maxima dreapta: ");
   Serial.print(dist_max_right);
@@ -129,6 +135,10 @@ void loop()
   if(LeftSensor>250)
     analogWrite(Mot_left_pin,0); 
   // End of left motor driving algorithm 
+ 
+ 
+ }
+  // End of veryfing the range limit
     
 }
 
